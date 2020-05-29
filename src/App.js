@@ -1,24 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import Phone from "./bg";
+import "./App.css";
+import Button from "./components/Button";
+import Box from "./components/Box";
 
 function App() {
+  const [advice, set] = useState([]);
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current.scrollIntoView({ behavior: "smooth" });
+  }, [advice]);
+  const handleClick = (e) => {
+    e.preventDefault();
+    axios
+      .get("https://v1.hitokoto.cn?c=d")
+      .then((res) => {
+        set([...advice, res.data.hitokoto]);
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="container">
+        <Phone />
+        <Button onClick={handleClick} />
+        <div className="lists">
+          {advice.map((item, index) => (
+            <Box text={item} key={index} />
+          ))}
+          <div ref={ref}></div>
+        </div>
+      </div>
     </div>
   );
 }
